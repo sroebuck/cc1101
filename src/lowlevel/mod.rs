@@ -34,10 +34,7 @@ where
     CS: OutputPin<Error = GpioE>,
 {
     pub fn new(spi: SPI, cs: CS) -> Result<Self, Error<SpiE, GpioE>> {
-        let cc1101 = Cc1101 {
-            spi: spi,
-            cs: cs,
-        };
+        let cc1101 = Cc1101 { spi, cs };
         Ok(cc1101)
     }
 
@@ -83,7 +80,9 @@ where
         R: Into<Register>,
     {
         self.cs.set_low().map_err(Error::Gpio)?;
-        self.spi.write(&mut [reg.into().waddr(), byte]).map_err(Error::Spi)?;
+        self.spi
+            .write(&[reg.into().waddr(), byte])
+            .map_err(Error::Spi)?;
         self.cs.set_high().map_err(Error::Gpio)?;
         Ok(())
     }
